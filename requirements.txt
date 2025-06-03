@@ -1,0 +1,7 @@
+dash==3.0.4
+dash-leaflet==1.0.15
+dash-extensions==0.1.10
+pandas==2.2.2
+geopy==2.4.1
+pytest==8.2.1
+jupyterlab==4.1.8
