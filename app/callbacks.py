@@ -1,13 +1,13 @@
 from dash_extensions.enrich import Output, Input
 
-def register_callbacks(app, tree):
+def register_callbacks(app, tree, data_default):
     @app.callback(
         Output("tabela-estabelecimentos", "data"),
         Input("edit_control", "geojson")
     )
     def filtrar_por_area(geojson):
         if not geojson or not geojson.get("features"):
-            return []
+            return data_default
 
         coords = geojson["features"][0]["geometry"]["coordinates"][0]
         lons = [p[0] for p in coords]

@@ -21,7 +21,7 @@ geojson = convert_df_to_geojson(df)
 
 app = DashProxy()
 app.layout = build_layout(geojson)
-register_callbacks(app, tree)
+register_callbacks(app, tree, df.to_dict("records"))
 
 if __name__ == "__main__":
     app.run()
