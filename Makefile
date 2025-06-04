@@ -10,5 +10,8 @@ run:
 test:
 	pytest -v tests
 
+scrape:
+	python scripts/scrape_buteco.py
+
 # Rodar testes e depois o app
 all: install test run
