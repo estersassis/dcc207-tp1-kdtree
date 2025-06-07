@@ -1,5 +1,5 @@
 dash==3.0.4
-dash-leaflet==1.0.15
+dash-leaflet>=1.0.17
 dash-extensions==0.1.10
 pandas==2.2.2
 geopy==2.4.1
