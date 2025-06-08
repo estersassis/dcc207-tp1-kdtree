@@ -24,7 +24,7 @@ def build_layout(geojson):
                         zoomToBoundsOnClick=False,
                         hideout={}
                     ),
-                    dl.LayerGroup(id="marcador-selecionado"),
+                    dl.LayerGroup(id="selected-marker"),
                     dl.Popup(id="popup")
                 ],
                 style={"height": "65vh", "width": "100%"},
@@ -34,7 +34,7 @@ def build_layout(geojson):
             html.Div([
                 html.Button(
                     "Restaurantes Comida di Buteco",
-                    id="btn-toggle-tabela-flutuante",
+                    id="btn-toggle-floating-table",
                     n_clicks=0,
                     style={
                         "backgroundColor": "#c4b194",
@@ -57,7 +57,7 @@ def build_layout(geojson):
             }),
             html.Div([
                 dash_table.DataTable(
-                    id="tabela-flutuante",
+                    id="floating-table",
                     columns=[{"name": "NOME", "id": "NOME"}],
                     data=[],
                     page_size=5,
@@ -89,7 +89,7 @@ def build_layout(geojson):
                     ]
                 )
             ],
-            id="caixa-tabela-flutuante",
+            id="floating-table-box",
             style={
                 "display": "none",
                 "position": "absolute",
@@ -118,7 +118,7 @@ def build_layout(geojson):
                 "color": "#444"
             }),
             dash_table.DataTable(
-                id="tabela-estabelecimentos",
+                id="establishments-table",
                 columns=[
                     {"name": "Nome", "id": "NOME"},
                     {"name": "Endereço", "id": "ENDERECO"},
@@ -165,7 +165,7 @@ def build_layout(geojson):
             "width": "100%",
             "boxSizing": "border-box"
         }),
-        dcc.Store(id="visibilidade-flutuante", data=False)
+        dcc.Store(id="floating-visibility", data=False)
     ],
     style={
         "backgroundColor": "#eee3d1",

@@ -6,14 +6,14 @@ from dash import html, no_update, ctx
 
 ultimo_click = -1
 
-def register_callbacks(app, tree, geojson_original, data_default, data_default_buteco):
+def register_callbacks(app, tree, data, data_buteco):
     @app.callback(
-        Output("tabela-estabelecimentos", "data"),
+        Output("establishments-table", "data"),
         Input("edit_control", "geojson")
     )
-    def filtrar_por_area(geojson):
+    def filter_by_area(geojson):
         if not geojson or not geojson.get("features"):
-            return data_default
+            return data
 
         coords = geojson["features"][0]["geometry"]["coordinates"][0]
         lons = [p[0] for p in coords]
@@ -21,25 +21,25 @@ def register_callbacks(app, tree, geojson_original, data_default, data_default_b
         lon_min, lon_max = min(lons), max(lons)
         lat_min, lat_max = min(lats), max(lats)
 
-        pontos = tree.search([(lon_min, lat_min), (lon_max, lat_max)])
-        return [{"NOME": p.name, "ENDERECO": p.address, "IND_POSSUI_ALVARA": p.alvara, "DATA_INICIO_ATIVIDADE": p.date} for p in pontos]
+        points = tree.search([(lon_min, lat_min), (lon_max, lat_max)])
+        return [{"NOME": p.name, "ENDERECO": p.address, "IND_POSSUI_ALVARA": p.alvara, "DATA_INICIO_ATIVIDADE": p.date} for p in points]
 
     @app.callback(
-        Output("caixa-tabela-flutuante", "style"),
-        Output("visibilidade-flutuante", "data"),
-        Output("tabela-flutuante", "data"),
-        Input("btn-toggle-tabela-flutuante", "n_clicks"),
-        State("btn-toggle-tabela-flutuante", "n_clicks_timestamp"),
-        State("visibilidade-flutuante", "data"),
+        Output("floating-table-box", "style"),
+        Output("floating-visibility", "data"),
+        Output("floating-table", "data"),
+        Input("btn-toggle-floating-table", "n_clicks"),
+        State("btn-toggle-floating-table", "n_clicks_timestamp"),
+        State("floating-visibility", "data"),
         prevent_initial_call=True
     )
-    def toggle_tabela_flutuante(n_clicks, ts, visivel):
+    def toggle_floating_table(n_clicks, ts, visible):
         global ultimo_click
 
         if ts == ultimo_click:
             return no_update, no_update, no_update
 
-        if ctx.triggered_id != "btn-toggle-tabela-flutuante":
+        if ctx.triggered_id != "btn-toggle-floating-table":
             raise dash.exceptions.PreventUpdate
 
         if ts == ultimo_click:
@@ -47,10 +47,10 @@ def register_callbacks(app, tree, geojson_original, data_default, data_default_b
             raise dash.exceptions.PreventUpdate
         
         ultimo_click = ts
-        novo_visivel = not visivel
+        new_visible = not visible
 
         style = {
-            "display": "block" if novo_visivel else "none",
+            "display": "block" if new_visible else "none",
             "position": "absolute",
             "top": "50%",
             "right": "1%",
@@ -64,15 +64,15 @@ def register_callbacks(app, tree, geojson_original, data_default, data_default_b
             "border": "none"
         }
 
-        return style, novo_visivel, data_default_buteco
+        return style, new_visible, data_buteco
     
     @app.callback(
-        Output("marcador-selecionado", "children"),
-        Input("tabela-flutuante", "selected_cells"),
-        State("tabela-flutuante", "data"),
+        Output("selected-marker", "children"),
+        Input("floating-table", "selected_cells"),
+        State("floating-table", "data"),
         prevent_initial_call=True
     )
-    def destacar_estabelecimento(selected_cells, data):
+    def highlight_establishment(selected_cells, data):
         if not selected_cells:
             raise dash.exceptions.PreventUpdate
 
@@ -84,7 +84,7 @@ def register_callbacks(app, tree, geojson_original, data_default, data_default_b
 
         lat = data[row].get("LATITUDE")
         lon = data[row].get("LONGITUDE")
-        nome = data[row].get("NOME")
+        name = data[row].get("NOME")
         address = data[row].get("ENDERECO")
 
         if lat is None or lon is None:
@@ -104,7 +104,7 @@ def register_callbacks(app, tree, geojson_original, data_default, data_default_b
                     dl.Popup(
                         html.Div([
                             html.Img(src=data[row].get("IMG_URL"), style={"width": "100%", "borderRadius": "10px"}),
-                            html.H4(nome, style={"marginTop": "10px", "marginBottom": "5px"}),
+                            html.H4(name, style={"marginTop": "10px", "marginBottom": "5px"}),
                             html.P(address, style={"fontSize": "12px", "margin": 0, "color": "#555"}),
                             html.Hr(),
                             html.B("🍽 Prato: "), html.Span(data[row].get("PRATO", "Não informado")),

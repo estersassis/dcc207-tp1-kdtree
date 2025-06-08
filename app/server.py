@@ -60,7 +60,7 @@ app.index_string = '''
 '''
 
 app.layout = build_layout(geojson)
-register_callbacks(app, tree, geojson, df.to_dict("records"), df_buteco.to_dict("records"))
+register_callbacks(app, tree, df.to_dict("records"), df_buteco.to_dict("records"))
 
 if __name__ == "__main__":
     app.run()
