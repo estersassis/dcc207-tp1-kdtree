@@ -4,14 +4,30 @@ import dash_leaflet as dl
 import dash
 from dash import html, no_update, ctx
 
+# Armazena o timestamp do último clique no botão flutuante, para evitar cliques duplicados
 ultimo_click = -1
 
 def register_callbacks(app, tree, data, data_buteco):
+    """
+    Registra os callbacks responsáveis pela interatividade do mapa e da tabela.
+
+    Parâmetros:
+    - app: instância principal do Dash.
+    - tree: KDTree contendo os estabelecimentos, usada para buscas espaciais.
+    - data: dados principais da tabela (pandas DataFrame ou lista de dicionários).
+    - data_buteco: dados complementares com informações visuais e descritivas de estabelecimentos do evento Comida di Buteco.
+    """
+
     @app.callback(
         Output("establishments-table", "data"),
         Input("edit_control", "geojson")
     )
     def filter_by_area(geojson):
+        """
+        Se uma área for desenhada usando a ferramenta de edição, usa a KDTree para buscar os estabelecimentos
+        dentro dos limites da área e retorna apenas esses dados.
+        """
+
         if not geojson or not geojson.get("features"):
             return data
 
@@ -34,6 +50,9 @@ def register_callbacks(app, tree, data, data_buteco):
         prevent_initial_call=True
     )
     def toggle_floating_table(n_clicks, ts, visible):
+        """
+        Alterna a visibilidade da tabela flutuante ao clicar no botão.
+        """
         global ultimo_click
 
         if ts == ultimo_click:
@@ -73,6 +92,11 @@ def register_callbacks(app, tree, data, data_buteco):
         prevent_initial_call=True
     )
     def highlight_establishment(selected_cells, data):
+        """
+        Destaca o marcador no mapa correspondente ao estabelecimento selecionado na tabela flutuante.
+
+        Exibe um ícone customizado e um popup com imagem, nome, prato e telefone.
+        """
         if not selected_cells:
             raise dash.exceptions.PreventUpdate
 
