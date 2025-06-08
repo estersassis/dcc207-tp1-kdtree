@@ -1,8 +1,12 @@
 from dash_extensions.enrich import Output, Input, State
+import dash_leaflet.express as dlx
+import dash_leaflet as dl
 import dash
+from dash import html, no_update, ctx
 
+ultimo_click = -1
 
-def register_callbacks(app, tree, data_default, data_default_buteco):
+def register_callbacks(app, tree, geojson_original, data_default, data_default_buteco):
     @app.callback(
         Output("tabela-estabelecimentos", "data"),
         Input("edit_control", "geojson")
@@ -25,47 +29,96 @@ def register_callbacks(app, tree, data_default, data_default_buteco):
         Output("visibilidade-flutuante", "data"),
         Output("tabela-flutuante", "data"),
         Input("btn-toggle-tabela-flutuante", "n_clicks"),
+        State("btn-toggle-tabela-flutuante", "n_clicks_timestamp"),
         State("visibilidade-flutuante", "data"),
         prevent_initial_call=True
     )
-    def toggle_tabela_flutuante(n, visivel):
+    def toggle_tabela_flutuante(n_clicks, ts, visivel):
+        global ultimo_click
+
+        if ts == ultimo_click:
+            return no_update, no_update, no_update
+
+        if ctx.triggered_id != "btn-toggle-tabela-flutuante":
+            raise dash.exceptions.PreventUpdate
+
+        if ts == ultimo_click:
+            print("Clique duplicado ignorado.")
+            raise dash.exceptions.PreventUpdate
+        
+        ultimo_click = ts
         novo_visivel = not visivel
+
         style = {
             "display": "block" if novo_visivel else "none",
             "position": "absolute",
-            "top": "60px",
-            "right": "10px",
-            "width": "250px",
+            "top": "50%",
+            "right": "1%",
+            "width": "20em",
+            "maxWidth": "90vw",
             "zIndex": "1000",
-            "backgroundColor": "white",
-            "border": "1px solid #ccc",
-            "borderRadius": "5px",
-            "boxShadow": "2px 2px 5px rgba(0,0,0,0.3)",
-            "padding": "10px"
+            "backgroundColor": "#ffffff",
+            "borderRadius": "10px",
+            "boxShadow": "2px 2px 8px rgba(0,0,0,0.2)",
+            "padding": "10px",
+            "border": "none"
         }
-        if not novo_visivel:
-            style["display"] = "none"
+
         return style, novo_visivel, data_default_buteco
     
     @app.callback(
-        Output("mapa", "center"),
-        Output("mapa", "zoom"),
-        Input("tabela-flutuante", "active_cell"),
+        Output("marcador-selecionado", "children"),
+        Input("tabela-flutuante", "selected_cells"),
         State("tabela-flutuante", "data"),
         prevent_initial_call=True
     )
-    def focar_no_estabelecimento(active_cell, data):
-        if not active_cell:
+    def destacar_estabelecimento(selected_cells, data):
+        if not selected_cells:
             raise dash.exceptions.PreventUpdate
 
-        linha = active_cell["row"]
-        if linha >= len(data):
+        cell = selected_cells[0]
+        row = cell.get("row")
+        
+        if row is None or row >= len(data):
             raise dash.exceptions.PreventUpdate
 
-        lat = data[linha].get("LATITUDE")
-        lon = data[linha].get("LONGITUDE")
+        lat = data[row].get("LATITUDE")
+        lon = data[row].get("LONGITUDE")
+        nome = data[row].get("NOME")
+        address = data[row].get("ENDERECO")
 
         if lat is None or lon is None:
             raise dash.exceptions.PreventUpdate
+        
+        custom_icon = dict(
+            iconUrl="https://cdb-static-files.s3.amazonaws.com/wp-content/uploads/2022/03/25112702/logo-comida-di-buteco.webp",
+            iconSize=[60, 43]
+        )
 
-        return [lat, lon], 20  # zoom máximo (ajuste conforme necessário)
+        return [
+            dl.Marker(
+                position=[lat, lon],
+                icon=custom_icon,
+                zIndexOffset=1000,
+                children=[
+                    dl.Popup(
+                        html.Div([
+                            html.Img(src=data[row].get("IMG_URL"), style={"width": "100%", "borderRadius": "10px"}),
+                            html.H4(nome, style={"marginTop": "10px", "marginBottom": "5px"}),
+                            html.P(address, style={"fontSize": "12px", "margin": 0, "color": "#555"}),
+                            html.Hr(),
+                            html.B("🍽 Prato: "), html.Span(data[row].get("PRATO", "Não informado")),
+                            html.Br(),
+                            html.B("📞 Telefone: "), html.Span(data[row].get("TELEFONE", "Não informado")),
+                            html.Br(),
+                            html.P(data[row].get("DESCRICAO", ""), style={"marginTop": "10px", "fontStyle": "italic", "fontSize": "13px", "color": "#444"})
+                        ], style={
+                            "maxWidth": "250px",
+                            "fontFamily": "Arial",
+                            "padding": "5px"
+                        }),
+                        autoPan=True
+                    )
+                ]
+            )
+        ]
