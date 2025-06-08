@@ -4,7 +4,7 @@ install:
 
 # Rodar o app
 run:
-	python -m app.server
+	PORT=8000 python -m app.server
 
 # Rodar testes
 test:

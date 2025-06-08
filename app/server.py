@@ -4,6 +4,7 @@ from kdtree.kdtree import KDTree, Point
 from app.geojson_utils import convert_df_to_geojson
 from app.layout import build_layout
 from app.callbacks import register_callbacks
+import os
 
 df = pd.read_csv("data/bares_restaurantes_geocodificados.csv")
 df_buteco = pd.read_csv("data/comida_di_buteco_corrigido.csv")
@@ -65,4 +66,4 @@ app.layout = build_layout(geojson)
 register_callbacks(app, tree, df.to_dict("records"), df_buteco.to_dict("records"))
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8050)))
