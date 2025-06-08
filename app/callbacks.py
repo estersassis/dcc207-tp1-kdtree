@@ -53,6 +53,7 @@ def register_callbacks(app, tree, data, data_buteco):
         """
         Alterna a visibilidade da tabela flutuante ao clicar no botão.
         """
+
         global ultimo_click
 
         if ts == ultimo_click:
@@ -94,9 +95,9 @@ def register_callbacks(app, tree, data, data_buteco):
     def highlight_establishment(selected_cells, data):
         """
         Destaca o marcador no mapa correspondente ao estabelecimento selecionado na tabela flutuante.
-
         Exibe um ícone customizado e um popup com imagem, nome, prato e telefone.
         """
+
         if not selected_cells:
             raise dash.exceptions.PreventUpdate
 

@@ -2,9 +2,8 @@ from dash import html, dash_table, dcc, Output, Input, State, ctx
 import dash_leaflet as dl
 
 def build_layout(geojson):
-    print("RENDER DO MAPA")
     return html.Div([
-        # Mapa + botão + caixa flutuante
+        # Mapa + Botão de Restaurantes CDB + Tabela de Restaurantes CDB
         html.Div([
             # Mapa
             dl.Map(
@@ -31,6 +30,8 @@ def build_layout(geojson):
                 center=[-19.92, -43.94],
                 zoom=12
             ),
+            
+            # Botão de Restaurantes CDB
             html.Div([
                 html.Button(
                     "Restaurantes Comida di Buteco",
@@ -55,6 +56,8 @@ def build_layout(geojson):
                 "right": "20px",
                 "zIndex": "1000"
             }),
+            
+            # Tabela de Restaurantes CDB
             html.Div([
                 dash_table.DataTable(
                     id="floating-table",
@@ -105,9 +108,6 @@ def build_layout(geojson):
             }),
         ],
         style={"position": "relative"}),
-
-        # Tabela flutuante real (agora fixada na tela no canto inferior direito)
-        
 
         # Tabela principal
         html.Div([

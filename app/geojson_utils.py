@@ -1,4 +1,8 @@
 def convert_df_to_geojson(df):
+    """
+    Converte um DataFrame contendo informações de estabelecimentos em um objeto GeoJSON.
+    """
+    
     features = [
         {
             "type": "Feature",

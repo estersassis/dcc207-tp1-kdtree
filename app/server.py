@@ -21,6 +21,8 @@ tree = KDTree([
 geojson = convert_df_to_geojson(df)
 
 app = DashProxy()
+
+# Personaliza o HTML base da aplicação com estilo visual customizado
 app.index_string = '''
 <!DOCTYPE html>
 <html>
