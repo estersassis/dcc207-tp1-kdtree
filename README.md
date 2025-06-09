@@ -6,6 +6,9 @@ Este projeto foi desenvolvido como parte do **Trabalho Prático 1 (TP1)** da dis
 > **Ester Sara Assis Silva**  
 > **Julia Paes de Viterbo**
 
+> 🔗 Link para app iterativo:
+> https://estersassis.github.io/dcc207-tp1-kdtree/
+
 ## 🎯 Objetivo
 
 O sistema implementado realiza **consultas ortogonais sobre um conjunto de pontos geográficos** (bares e restaurantes da cidade de Belo Horizonte), com base em uma **estrutura de árvore k-dimensional (KD-Tree)**. O projeto visa não apenas fixar os conceitos de geometria computacional e estruturas de dados, mas também demonstrar a sua **aplicabilidade prática** por meio de uma interface interativa com mapas.
